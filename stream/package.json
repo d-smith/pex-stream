@@ -1,0 +1,20 @@
+{
+  "name": "pex-stream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@pythnetwork/client": "^2.6.0",
+    "@solana/web3.js": "^1.35.0",
+    "aws-sdk": "^2.1077.0",
+    "uuid": "^8.3.2"
+  }
+}
