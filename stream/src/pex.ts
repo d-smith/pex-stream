@@ -17,8 +17,17 @@ pythConnection.onPriceChange((product, price) => {
   if (price.price && price.confidence) {
     // tslint:disable-next-line:no-console
     console.log(`${product.symbol}: $${price.price} \xB1$${price.confidence}`)
+    
+    //let data = `${product.symbol},${price.price},${price.confidence}`;
+    const data = {
+      symbol: product.symbol,
+      price: price.price,
+      confidence: price.confidence
+    };
+
+    console.log(data);
     const params = {
-      Data: Buffer.from(`${product.symbol},${price.price},${price.confidence}`),
+      Data: Buffer.from(JSON.stringify(data)),
       PartitionKey: uuidv4(),
       StreamName: 'pyth'
     }

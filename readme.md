@@ -17,3 +17,20 @@ In the stream directory
 
 
 node dist/pex.js
+
+
+
+
+### Output Lambda 
+
+Deploy the output function
+
+*  sls deploy --region us-west-2
+
+### KDA_SQL
+
+## Clean Up
+
+Output lambda:
+
+sls remove --region us-west-2
