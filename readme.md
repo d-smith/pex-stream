@@ -10,9 +10,6 @@ The project is structured as follows:
 
 
 
-
-2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.BNB/USD","price":
-
 ## Set up
 
 ### Kinesis
@@ -39,25 +36,33 @@ Sample log output:
 
 ```
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.FIDA/USD","price":1.9368,"confidence":0.0016}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.STEP/USD","price":0.14875000000000002,"confidence":3.5000000000000005E-4}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.MNGO/USD","price":0.16311225000000001,"confidence":4.085E-5}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Metal.XAU/USD","price":1903.8700000000001,"confidence":0.23}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.AVAX/USD","price":75.615,"confidence":0.019}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.RAY/USD","price":2.8035,"confidence":0.0012}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.HXRO/USD","price":0.36722499999999997,"confidence":4.35E-4}
-
 2022-02-21T10:54:58.567-08:00	2022-02-21T18:54:58.567Z a8b25e72-e6b3-4686-9f03-527b2a2e7c71 INFO {"symbol":"Crypto.SNY/USD","price":1.0281,"confidence":0.001}
 ```
 
 ### KDA_SQL
 
 This can be set up and torn down using using the cells in the Jupyter notebook. The notebook assumes the account number for the AWS account is available as the PA_ACCOUNT_NO environment variable. Also note that while AWS_DEFAULT_PROFILE and AWS_DEFAULT_REGION must be set prior to running Jupyter notebook, us-west-2 is hardcode in a few places... the notebook also assumes an input Kinesis stream named pyth.
+
+The output of the KDA SQL application is a windowed query that returns the latest quote seen for a symbol in a 10 second window:
+
+```
+CREATE OR REPLACE STREAM "DESTINATION_SQL_STREAM" ("symbol" VARCHAR(32), "price" DOUBLE, "confidence" DOUBLE);
+CREATE OR REPLACE  PUMP "STREAM_PUMP" AS INSERT INTO "DESTINATION_SQL_STREAM"
+SELECT STREAM "symbol",
+LAST_VALUE("price") OVER W1 AS "price",
+LAST_VALUE("confidence") OVER W1 AS "confidence"
+FROM "SOURCE_SQL_STREAM_001"
+WINDOW W1 AS (
+    PARTITION BY "symbol"
+    RANGE INTERVAL '10' SECOND PRECEDING
+)
+```
 
 ## Clean Up
 
